@@ -4,6 +4,9 @@
 using namespace std;
 #define H 20
 #define W 15
+#define CELL "  "  // [THÊM] ô trống (2 khoảng trắng)
+#define BLOCK "██" // [THÊM] khối vuông đặc
+#define WALL "██"  // [THÊM] viền liền mạch
 char board[H][W] = {};
 char blocks[][4][4] = {
     {{' ', 'I', ' ', ' '},
