@@ -100,6 +100,8 @@ void hideCursor(){
     CONSOLE_CURSOR_INFO cursor;
     cursor.bVisible = FALSE;
     cursor.dwSize = sizeof(cursor);
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorInfo(handle, &cursor);
 }
 
 void draw(){
