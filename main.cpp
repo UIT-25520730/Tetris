@@ -117,9 +117,22 @@ void hideCursor()
 void draw()
 {
     gotoxy(0, 0);
-    for (int i = 0; i < H; i++, cout << endl)
+
+    for (int i = 0; i < H; i++)
+    {
         for (int j = 0; j < W; j++)
-            cout << board[i][j];
+        {
+            if (board[i][j] == '#')
+                cout << WALL; // [THÊM] vẽ viền
+
+            else if (board[i][j] != ' ')
+                cout << BLOCK; // [THÊM] vẽ block đặc
+
+            else
+                cout << CELL; // [THÊM] ô trống
+        }
+        cout << endl;
+    }
 }
 bool canMove(int dx, int dy)
 {
