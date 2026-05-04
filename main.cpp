@@ -124,7 +124,8 @@ bool canMove(int dx, int dy){
 
 
 int main()
-{
+{   
+    hideCursor();
     srand(time(0));
     b = rand() % 7;
     system("cls");
