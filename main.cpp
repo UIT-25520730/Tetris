@@ -158,8 +158,8 @@ int main()
     initBoard();
     while (1){
         boardDelBlock();
-        if (kbhit()){
-            char c = getch();
+        if (_kbhit()){
+            char c = _getch();
             if (c=='a' && canMove(-1,0)) x--;
             if (c=='d' && canMove(1,0) ) x++;
             if (c=='x' && canMove(0,1))  y++;
