@@ -75,9 +75,9 @@ char blocks[][4][4] = {
      {'L', 'L', 'L', ' '},
      {' ', ' ', ' ', ' '}}};
 
-int x = 4, y = 0, b = 1;
-void gotoxy(int x, int y)
-{
+int x=4,y=0,b=1;
+int speed = 200;
+void gotoxy(int x, int y) {
     COORD c = {x, y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
@@ -180,6 +180,13 @@ void removeLine()
             _sleep(50); // Khựng lại một chút cho người chơi nhận ra
         }
     }
+
+    // Nếu có ăn điểm thì làm game rơi nhanh hơn, tăng độ khó cho người chơi
+    if (linesCleared > 0) {
+        speed -= linesCleared * 10;
+        if (speed < 50) speed = 50; // Khóa mốc rơi nhanh tối đa để không bị lố
+    }
+
 }
 
 int main()
@@ -188,37 +195,43 @@ int main()
 
     hideCursor();
     srand(time(0));
-    b = rand() % 7;
+    b = rand() % 16;
     system("cls");
     initBoard();
-    while (1)
-    {
+    
+    while (1){
         boardDelBlock();
-        if (kbhit())
-        {
-            char c = getch();
-            if (c == 'a' && canMove(-1, 0))
+        if (_kbhit()){
+            char c = _getch();
+            
+            if (c=='a' && canMove(-1,0)) {
                 x--;
-            if (c == 'd' && canMove(1, 0))
+                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím A
+            }
+            if (c=='d' && canMove(1,0)) {
                 x++;
-            if (c == 'x' && canMove(0, 1))
+                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím D
+            }
+            if (c=='x' && canMove(0,1)) {
                 y++;
-            if (c == 'q')
-                break;
+                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím X
+            }
+            if (c=='q') break;
         }
-        if (canMove(0, 1))
-            y++;
-        else
-        {
+        
+        if (canMove(0,1)) y++;
+        else {
             block2Board();
-            removeLine(); // Gọi hàm xóa dòng ở đây, ngay khi khối bị chạm đáy đóng băng lại
-            x = 5;
-            y = 0;
-            b = rand() % 7;
+            removeLine(); 
+
+            x = 4; y = 0; b = rand() % 16; 
         }
+        
         block2Board();
         draw();
-        _sleep(200);
+
+        _sleep(speed); 
     }
     return 0;
 }
+
