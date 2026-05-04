@@ -199,6 +199,8 @@ int main()
     system("cls");
     initBoard();
     
+    DWORD lastFall = GetTickCount(); // [THÊM] timer mượt
+
     while (1){
         boardDelBlock();
         if (_kbhit()){
