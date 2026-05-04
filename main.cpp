@@ -150,30 +150,48 @@ void removeLine() {
 }
 
 int main()
-{   
-    hideCursor();
+{
+    
+    hideCursor();                
+    
     srand(time(0));
-    b = rand() % 7;
+    b = rand() % 16;
     system("cls");
     initBoard();
+    
     while (1){
         boardDelBlock();
         if (_kbhit()){
             char c = _getch();
-            if (c=='a' && canMove(-1,0)) x--;
-            if (c=='d' && canMove(1,0) ) x++;
-            if (c=='x' && canMove(0,1))  y++;
+            
+            if (c=='a' && canMove(-1,0)) {
+                x--;
+                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím A
+            }
+            if (c=='d' && canMove(1,0)) {
+                x++;
+                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím D
+            }
+            if (c=='x' && canMove(0,1)) {
+                y++;
+                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím X
+            }
             if (c=='q') break;
         }
+        
         if (canMove(0,1)) y++;
         else {
             block2Board();
-            removeLine(); // Gọi hàm xóa dòng ở đây, ngay khi khối bị chạm đáy đóng băng lại
-            x = 5; y = 0; b = rand() % 7;
+            removeLine(); 
+
+            x = 4; y = 0; b = rand() % 16; 
         }
+        
         block2Board();
         draw();
-        _sleep(200);
+
+        _sleep(speed); 
     }
     return 0;
 }
+
