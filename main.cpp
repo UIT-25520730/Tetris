@@ -73,6 +73,7 @@ char blocks[][4][4] = {
 };
 
 int x=4,y=0,b=1;
+int speed = 200;
 void gotoxy(int x, int y) {
     COORD c = {x, y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
@@ -147,6 +148,12 @@ void removeLine() {
             _sleep(50);   // Khựng lại một chút cho người chơi nhận ra
         }
     }
+
+    // Nếu có ăn điểm thì làm game rơi nhanh hơn, tăng độ khó cho người chơi
+    if (linesCleared > 0) {
+        speed -= linesCleared * 10;
+    }
+
 }
 
 int main()
