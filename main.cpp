@@ -152,6 +152,7 @@ void removeLine() {
     // Nếu có ăn điểm thì làm game rơi nhanh hơn, tăng độ khó cho người chơi
     if (linesCleared > 0) {
         speed -= linesCleared * 10;
+        if (speed < 50) speed = 50; // Khóa mốc rơi nhanh tối đa để không bị lố
     }
 
 }
