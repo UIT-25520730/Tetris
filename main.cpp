@@ -177,7 +177,7 @@ void removeLine()
 
             i++;        // Sau khi dịch xuống, phải kiểm tra lại chính index dòng này
             draw();     // Vẽ lại để tạo hiệu ứng ăn điểm
-            _sleep(50); // Khựng lại một chút cho người chơi nhận ra
+            Sleep(50); // Khựng lại một chút cho người chơi nhận ra
         }
     }
 
@@ -230,7 +230,7 @@ int main()
         block2Board();
         draw();
 
-        _sleep(speed); 
+        Sleep(speed); 
     }
     return 0;
 }
