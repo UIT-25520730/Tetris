@@ -95,6 +95,15 @@ void initBoard(){
             if ((i==H-1) || (j==0) || (j == W-1)) board[i][j] = '#';
             else board[i][j] = ' ';
 }
+
+void hideCursor(){
+    CONSOLE_CURSOR_INFO cursor;
+    cursor.bVisible = FALSE;
+    cursor.dwSize = sizeof(cursor);
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorInfo(handle, &cursor);
+}
+
 void draw(){
     gotoxy(0,0);
     for (int i = 0 ; i < H ; i++, cout<<endl)
@@ -115,7 +124,8 @@ bool canMove(int dx, int dy){
 
 
 int main()
-{
+{   
+    hideCursor();
     srand(time(0));
     b = rand() % 7;
     system("cls");
