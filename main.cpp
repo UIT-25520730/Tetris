@@ -203,14 +203,18 @@ int main()
 
     while (1) {
         boardDelBlock();
-        if (_kbhit()) {
-            char c = _getch();
-
-            if (c == 'a' && canMove(-1, 0)) x--;
-            if (c == 'd' && canMove(1, 0)) x++;
-            if (c == 'x' && canMove(0, 1)) y++;
-            if (c == 'q') break;
-        }
+      if (GetAsyncKeyState('A') & 0x8000) {
+    if (canMove(-1, 0)) x--;
+}
+if (GetAsyncKeyState('D') & 0x8000) {
+    if (canMove(1, 0)) x++;
+}
+if (GetAsyncKeyState('S') & 0x8000) {
+    if (canMove(0, 1)) y++;
+}
+if (GetAsyncKeyState('Q') & 0x8000) {
+    break;
+}
         // [THÊM] rơi mượt theo thời gian
         if (GetTickCount() - lastFall > speed) {
             if (canMove(0, 1)) y++;
