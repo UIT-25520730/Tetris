@@ -85,7 +85,7 @@ void boardDelBlock()
 {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            if (blocks[b][i][j] != ' ' && y + j < H)
+            if (blocks[b][i][j] != ' ' && y + i < H) // [SỬA]
                 board[y + i][x + j] = ' ';
 }
 void block2Board()
