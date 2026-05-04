@@ -221,12 +221,14 @@ int main()
             if (c=='q') break;
         }
         
-        if (canMove(0,1)) y++;
-        else {
-            block2Board();
-            removeLine(); 
-
-            x = 4; y = 0; b = rand() % 16; 
+        if (GetTickCount() - lastFall > speed) {
+            if (canMove(0, 1)) y++;
+            else {
+                block2Board();
+                removeLine();
+                x = 4; y = 0; b = rand() % 16;
+            }
+            lastFall = GetTickCount();
         }
         
         block2Board();
