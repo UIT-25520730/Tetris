@@ -177,7 +177,7 @@ void removeLine()
 
             i++;        // Sau khi dịch xuống, phải kiểm tra lại chính index dòng này
             draw();     // Vẽ lại để tạo hiệu ứng ăn điểm
-            _sleep(50); // Khựng lại một chút cho người chơi nhận ra
+            Sleep(50); // Khựng lại một chút cho người chơi nhận ra
         }
     }
 
@@ -199,38 +199,33 @@ int main()
     system("cls");
     initBoard();
     
-    while (1){
-        boardDelBlock();
-        if (_kbhit()){
-            char c = _getch();
-            
-            if (c=='a' && canMove(-1,0)) {
-                x--;
-                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím A
-            }
-            if (c=='d' && canMove(1,0)) {
-                x++;
-                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím D
-            }
-            if (c=='x' && canMove(0,1)) {
-                y++;
-                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím X
-            }
-            if (c=='q') break;
-        }
-        
-        if (canMove(0,1)) y++;
-        else {
-            block2Board();
-            removeLine(); 
+    DWORD lastFall = GetTickCount(); // [THÊM] timer mượt
 
-            x = 4; y = 0; b = rand() % 16; 
+    while (1) {
+        boardDelBlock();
+        if (_kbhit()) {
+            char c = _getch();
+
+            if (c == 'a' && canMove(-1, 0)) x--;
+            if (c == 'd' && canMove(1, 0)) x++;
+            if (c == 'x' && canMove(0, 1)) y++;
+            if (c == 'q') break;
+        }
+        // [THÊM] rơi mượt theo thời gian
+        if (GetTickCount() - lastFall > speed) {
+            if (canMove(0, 1)) y++;
+            else {
+                block2Board();
+                removeLine();
+                x = 4; y = 0; b = rand() % 16;
+            }
+            lastFall = GetTickCount();
         }
         
         block2Board();
         draw();
 
-        _sleep(speed); 
+        Sleep(16); //fps 60
     }
     return 0;
 }
