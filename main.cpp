@@ -121,7 +121,33 @@ bool canMove(int dx, int dy){
             }
     return true;
 }
+void removeLine() {
+    int linesCleared = 0;
 
+    // Quét từ áp chót (H-2) lên trên
+    for (int i = H - 2; i > 0; i--) {
+        bool isFull = true;
+        for (int j = 1; j < W - 1; j++) {
+            if (board[i][j] == ' ') {
+                isFull = false;
+                break;
+            }
+        }
+
+        // Nếu dòng đầy -> ăn điểm
+        if (isFull) {
+            linesCleared++;
+            // Dịch toàn bộ các dòng phía trên xuống 1 bậc
+            for (int ii = i; ii > 0; ii--)
+                for (int j = 1; j < W - 1; j++)
+                    board[ii][j] = board[ii - 1][j];
+
+            i++; // Sau khi dịch xuống, phải kiểm tra lại chính index dòng này
+            draw();       // Vẽ lại để tạo hiệu ứng ăn điểm
+            _sleep(50);   // Khựng lại một chút cho người chơi nhận ra
+        }
+    }
+}
 
 int main()
 {   
@@ -142,7 +168,7 @@ int main()
         if (canMove(0,1)) y++;
         else {
             block2Board();
-
+            removeLine(); // Gọi hàm xóa dòng ở đây, ngay khi khối bị chạm đáy đóng băng lại
             x = 5; y = 0; b = rand() % 7;
         }
         block2Board();
