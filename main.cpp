@@ -201,26 +201,17 @@ int main()
     
     DWORD lastFall = GetTickCount(); // [THÊM] timer mượt
 
-    while (1){
+    while (1) {
         boardDelBlock();
-        if (_kbhit()){
+        if (_kbhit()) {
             char c = _getch();
-            
-            if (c=='a' && canMove(-1,0)) {
-                x--;
-                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím A
-            }
-            if (c=='d' && canMove(1,0)) {
-                x++;
-                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím D
-            }
-            if (c=='x' && canMove(0,1)) {
-                y++;
-                while (_kbhit()) _getch(); // Xóa bộ đệm chống dính phím X
-            }
-            if (c=='q') break;
+
+            if (c == 'a' && canMove(-1, 0)) x--;
+            if (c == 'd' && canMove(1, 0)) x++;
+            if (c == 'x' && canMove(0, 1)) y++;
+            if (c == 'q') break;
         }
-        
+        // [THÊM] rơi mượt theo thời gian
         if (GetTickCount() - lastFall > speed) {
             if (canMove(0, 1)) y++;
             else {
@@ -234,7 +225,7 @@ int main()
         block2Board();
         draw();
 
-        Sleep(speed); 
+        Sleep(16); //fps 60
     }
     return 0;
 }
