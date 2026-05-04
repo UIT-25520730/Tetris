@@ -95,6 +95,11 @@ void initBoard(){
             if ((i==H-1) || (j==0) || (j == W-1)) board[i][j] = '#';
             else board[i][j] = ' ';
 }
+
+void hideCursor(){
+    CONSOLE_CURSOR_INFO cursor;
+}
+
 void draw(){
     gotoxy(0,0);
     for (int i = 0 ; i < H ; i++, cout<<endl)
