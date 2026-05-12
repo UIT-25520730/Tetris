@@ -1,236 +1,180 @@
 #include <iostream>
-#include <conio.h>
 #include <windows.h>
 #include <ctime>
+#include <string>
+#include <conio.h>
+
 using namespace std;
+
 #define H 20
 #define W 15
-#define CELL "  "  // [THÊM] ô trống (2 khoảng trắng)
-#define BLOCK "██" // [THÊM] khối vuông đặc
-#define WALL "██"  // [THÊM] viền liền mạch
-char board[H][W] = {};
-char blocks[][4][4] = {
-    {{' ', 'I', ' ', ' '},
-     {' ', 'I', ' ', ' '},
-     {' ', 'I', ' ', ' '},
-     {' ', 'I', ' ', ' '}},
-    {{' ', 'I', ' ', ' '},
-     {' ', 'I', ' ', ' '},
-     {' ', 'I', ' ', ' '},
-     {' ', 'I', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {'I', 'I', 'I', 'I'},
-     {' ', ' ', ' ', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', 'O', 'O', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'T', ' ', ' '},
-     {'T', 'T', 'T', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', 'S', 'S', ' '},
-     {'S', 'S', ' ', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {'Z', 'Z', ' ', ' '},
-     {' ', 'Z', 'Z', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {'J', ' ', ' ', ' '},
-     {'J', 'J', 'J', ' '},
-     {' ', ' ', ' ', ' '}},
-    {{' ', ' ', ' ', ' '},
-     {' ', ' ', 'L', ' '},
-     {'L', 'L', 'L', ' '},
-     {' ', ' ', ' ', ' '}}};
+#define CELL "  "
+#define BLOCK "██"
+#define WALL "██"
 
-int x=4,y=0,b=1;
-int speed = 200;
+char board[H][W];
+
+
+class Piece {
+protected: char shape[4][4];
+public:
+    virtual ~Piece() {}
+    char getCell(int i, int j) const { return shape[i][j]; }
+    void clearShape() { for (int i=0; i<4; i++) for (int j=0; j<4; j++) shape[i][j] = ' '; }
+
+};
+
+class PieceI : public Piece { public: PieceI() { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[3][1]='I'; } };
+class PieceO : public Piece { public: PieceO() { clearShape(); shape[1][1]=shape[1][2]=shape[2][1]=shape[2][2]='O'; } };
+class PieceT : public Piece { public: PieceT() { clearShape(); shape[1][0]=shape[1][1]=shape[1][2]=shape[0][1]='T'; } };
+class PieceS : public Piece { public: PieceS() { clearShape(); shape[1][0]=shape[1][1]=shape[0][1]=shape[0][2]='S'; } };
+class PieceZ : public Piece { public: PieceZ() { clearShape(); shape[0][0]=shape[0][1]=shape[1][1]=shape[1][2]='Z'; } };
+class PieceJ : public Piece { public: PieceJ() { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][0]='J'; } };
+class PieceL : public Piece { public: PieceL() { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][2]='L'; } };
+
+int x = 5, y = 0, speed = 400;
+Piece* currentPiece = NULL;
+
 void gotoxy(int x, int y) {
-    COORD c = {x, y};
+    COORD c = {(short)(x * 2), (short)y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
-void boardDelBlock()
-{
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            if (blocks[b][i][j] != ' ' && y + i < H) // [SỬA]
-                board[y + i][x + j] = ' ';
-}
-void block2Board()
-{
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            if (blocks[b][i][j] != ' ')
-                board[y + i][x + j] = blocks[b][i][j];
-}
-void initBoard()
-{
+
+void initBoard() {
     for (int i = 0; i < H; i++)
         for (int j = 0; j < W; j++)
-            if ((i == H - 1) || (j == 0) || (j == W - 1))
-                board[i][j] = '#';
-            else
-                board[i][j] = ' ';
+            board[i][j] = ((i == H - 1) || (j == 0) || (j == W - 1)) ? '#' : ' ';
 }
 
-void hideCursor()
-{
-    CONSOLE_CURSOR_INFO cursor;
-    cursor.bVisible = FALSE;
-    cursor.dwSize = sizeof(cursor);
-    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleCursorInfo(handle, &cursor);
+void boardDelBlock() {
+    for (int i=0; i<4; i++) for (int j=0; j<4; j++)
+        if (currentPiece->getCell(i, j) != ' ' && y + i < H) board[y+i][x+j] = ' ';
 }
 
-void draw()
-{
-    gotoxy(0, 0);
+void block2Board() {
+    for (int i=0; i<4; i++) for (int j=0; j<4; j++)
+        if (currentPiece->getCell(i, j) != ' ') board[y+i][x+j] = currentPiece->getCell(i, j);
+}
 
-    for (int i = 0; i < H; i++)
-    {
-        for (int j = 0; j < W; j++)
-        {
-            if (board[i][j] == '#')
-                cout << WALL; // [THÊM] vẽ viền
-
-            else if (board[i][j] != ' ')
-                cout << BLOCK; // [THÊM] vẽ block đặc
-
-            else
-                cout << CELL; // [THÊM] ô trống
+bool canMove(int dx, int dy, int testX, int testY, char customShape[4][4] = NULL) {
+    for (int i=0; i<4; i++) for (int j=0; j<4; j++) {
+        char cell = (customShape) ? customShape[i][j] : currentPiece->getCell(i, j);
+        if (cell != ' ') {
+            int tx = testX + j + dx, ty = testY + i + dy;
+            if (tx < 1 || tx >= W - 1 || ty >= H - 1 || board[ty][tx] != ' ') return false;
         }
-        cout << endl;
     }
-}
-bool canMove(int dx, int dy)
-{
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            if (blocks[b][i][j] != ' ')
-            {
-                int tx = x + j + dx;
-                int ty = y + i + dy;
-                if (tx < 1 || tx >= W - 1 || ty >= H - 1)
-                    return false;
-                if (board[ty][tx] != ' ')
-                    return false;
-            }
     return true;
 }
-void removeLine()
-{
-    int linesCleared = 0;
 
-    // Quét từ áp chót (H-2) lên trên
-    for (int i = H - 2; i > 0; i--)
-    {
-        bool isFull = true;
-        for (int j = 1; j < W - 1; j++)
-        {
-            if (board[i][j] == ' ')
-            {
-                isFull = false;
-                break;
-            }
-        }
-
-        // Nếu dòng đầy -> ăn điểm
-        if (isFull)
-        {
-            linesCleared++;
-            // Dịch toàn bộ các dòng phía trên xuống 1 bậc
+void removeLine() {
+    for (int i = H - 2; i > 0; i--) {
+        bool full = true;
+        for (int j = 1; j < W - 1; j++) if (board[i][j] == ' ') full = false;
+        if (full) {
             for (int ii = i; ii > 0; ii--)
-                for (int j = 1; j < W - 1; j++)
-                    board[ii][j] = board[ii - 1][j];
-
-            i++;        // Sau khi dịch xuống, phải kiểm tra lại chính index dòng này
-            draw();     // Vẽ lại để tạo hiệu ứng ăn điểm
-            Sleep(50); // Khựng lại một chút cho người chơi nhận ra
+                for (int jj = 1; jj < W - 1; jj++) board[ii][jj] = board[ii - 1][jj];
+            i++; speed = max(100, speed - 10);
         }
     }
+}
 
-    // Nếu có ăn điểm thì làm game rơi nhanh hơn, tăng độ khó cho người chơi
-    if (linesCleared > 0) {
-        speed -= linesCleared * 10;
-        if (speed < 50) speed = 50; // Khóa mốc rơi nhanh tối đa để không bị lố
+void draw() {
+    gotoxy(0, 0);
+    string s = "";
+    for (int i = 0; i < H; i++) {
+        for (int j = 0; j < W; j++) {
+            if (board[i][j] == '#') s += WALL;
+            else if (board[i][j] != ' ') s += BLOCK;
+            else s += CELL;
+        }
+        s += "\n";
     }
 
+    cout << s;
 }
 
-int main()
-{
+Piece* getRandomPiece() {
+    switch (rand() % 7) {
+        case 0: return new PieceI(); case 1: return new PieceO();
+        case 2: return new PieceT(); case 3: return new PieceS();
+        case 4: return new PieceZ(); case 5: return new PieceJ();
+        default: return new PieceL();
+    }
+}
+
+int main() {
     SetConsoleOutputCP(CP_UTF8);
-
-    hideCursor();
-    srand(time(0));
-    b = rand() % 16;
-    system("cls");
+    srand((unsigned)time(0));
     initBoard();
-    
-    DWORD lastFall = GetTickCount(); // [THÊM] timer mượt
+    currentPiece = getRandomPiece();
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+CONSOLE_CURSOR_INFO cursorInfo;
+GetConsoleCursorInfo(hOut, &cursorInfo);
+cursorInfo.bVisible = false;
+SetConsoleCursorInfo(hOut, &cursorInfo);
+    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD mode;
+    GetConsoleMode(hIn, &mode);
+    SetConsoleMode(hIn, mode & ~ENABLE_QUICK_EDIT_MODE);
 
-    while (1) {
-        boardDelBlock();
-      if (GetAsyncKeyState('A') & 0x8000) {
-    if (canMove(-1, 0)) x--;
-}
-if (GetAsyncKeyState('D') & 0x8000) {
-    if (canMove(1, 0)) x++;
-}
-if (GetAsyncKeyState('S') & 0x8000) {
-    if (canMove(0, 1)) y++;
-}
-if (GetAsyncKeyState('Q') & 0x8000) {
-    break;
-}
-        // [THÊM] rơi mượt theo thời gian
-        if (GetTickCount() - lastFall > speed) {
-            if (canMove(0, 1)) y++;
-            else {
+    DWORD lastFall = GetTickCount();
+    DWORD lastMove = GetTickCount();
+
+    while (true) {
+        bool changed = false;
+
+
+        if (GetTickCount() - lastMove > 60) {
+
+
+
+            boardDelBlock();
+
+            if (GetAsyncKeyState('A') & 0x8000) { if (canMove(-1, 0, x, y)) { x--; changed = true;
+            FlushConsoleInputBuffer(hIn);
+            while (_kbhit()) _getch();
+            }
+            }
+            if (GetAsyncKeyState('D') & 0x8000) { if (canMove(1, 0, x, y)) { x++; changed = true; FlushConsoleInputBuffer(hIn);
+            while (_kbhit()) _getch();
+            }
+            }
+            if (GetAsyncKeyState('S') & 0x8000) { if (canMove(0, 1, x, y)) { y++; changed = true;FlushConsoleInputBuffer(hIn);
+            while (_kbhit()) _getch();
+            }
+            }
+
+
+
+
+            if (GetAsyncKeyState('Q') & 0x8000) break;
+
+            lastMove = GetTickCount();
+            block2Board();
+        }
+
+
+        if (GetTickCount() - lastFall > (DWORD)speed) {
+            boardDelBlock();
+            if (canMove(0, 1, x, y)) {
+                y++;
+                block2Board();
+            } else {
                 block2Board();
                 removeLine();
-                x = 4; y = 0; b = rand() % 16;
+                delete currentPiece;
+                x = 5; y = 0; currentPiece = getRandomPiece();
+                if (!canMove(0, 0, x, y)) { system("cls"); cout << "GAME OVER!"; break; }
             }
+            changed = true;
             lastFall = GetTickCount();
         }
-        
-        block2Board();
-        draw();
 
-        Sleep(16); //fps 60
+
+        if (changed) draw();
+
+        Sleep(10);
     }
     return 0;
 }
-
