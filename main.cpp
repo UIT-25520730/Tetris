@@ -131,16 +131,16 @@ SetConsoleCursorInfo(hOut, &cursorInfo);
 
             boardDelBlock();
 
-            if (GetAsyncKeyState('A') & 0x8000) { if (canMove(-1, 0, x, y)) { x--; changed = true;
+            if (GetAsyncKeyState(VK_LEFT) & 0x8000) { if (canMove(-1, 0, x, y)) { x--; changed = true;
             FlushConsoleInputBuffer(hIn);
             while (_kbhit()) _getch();
             }
             }
-            if (GetAsyncKeyState('D') & 0x8000) { if (canMove(1, 0, x, y)) { x++; changed = true; FlushConsoleInputBuffer(hIn);
+            if (GetAsyncKeyState(VK_RIGHT) & 0x8000) { if (canMove(1, 0, x, y)) { x++; changed = true; FlushConsoleInputBuffer(hIn);
             while (_kbhit()) _getch();
             }
             }
-            if (GetAsyncKeyState('S') & 0x8000) { if (canMove(0, 1, x, y)) { y++; changed = true;FlushConsoleInputBuffer(hIn);
+            if (GetAsyncKeyState(VK_DOWN) & 0x8000) { if (canMove(0, 1, x, y)) { y++; changed = true;FlushConsoleInputBuffer(hIn);
             while (_kbhit()) _getch();
             }
             }
