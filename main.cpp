@@ -188,7 +188,21 @@ void removeLine()
     }
 
 }
-
+void rotateBlock() {
+    char temp[4][4];
+    // Xoay 90 độ theo chiều kim đồng hồ
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            temp[j][3 - i] = blocks[b][i][j];
+        }
+    }
+    // Tạm thời cập nhật luôn (chưa check va chạm)
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            blocks[b][i][j] = temp[i][j];
+        }
+    }
+}
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
