@@ -196,10 +196,18 @@ void rotateBlock() {
             temp[j][3 - i] = blocks[b][i][j];
         }
     }
-    // Tạm thời cập nhật luôn (chưa check va chạm)
+    // Kiểm tra xem sau khi xoay có bị đè vào tường hoặc khối khác không
+    // (Sử dụng logic tương tự canMove nhưng kiểm tra với mảng temp)
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            blocks[b][i][j] = temp[i][j];
+            if (temp[i][j] != ' ') {
+                int tx = x + j;
+                int ty = y + i;
+                // Kiểm tra va chạm biên và va chạm khối tĩnh trên board
+                if (tx < 1 || tx >= W - 1 || ty >= H - 1 || board[ty][tx] != ' ') {
+                    return; // Nếu vướng thì không xoay, thoát hàm
+                }
+            }
         }
     }
 }
