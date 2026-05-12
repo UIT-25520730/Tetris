@@ -210,6 +210,12 @@ void rotateBlock() {
             }
         }
     }
+    //Nếu hợp lệ, cập nhật mảng gốc
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            blocks[b][i][j] = temp[i][j];
+        }
+    }
 }
 int main()
 {
@@ -236,6 +242,11 @@ if (GetAsyncKeyState('S') & 0x8000) {
 }
 if (GetAsyncKeyState('Q') & 0x8000) {
     break;
+}
+if (GetAsyncKeyState('W') & 0x8000) {
+    boardDelBlock(); // Xóa vị trí cũ trước khi xoay
+    rotateBlock();
+    Sleep(150);      // Delay ngắn để tránh việc xoay quá nhanh (spam phím)
 }
         // [THÊM] rơi mượt theo thời gian
         if (GetTickCount() - lastFall > speed) {
