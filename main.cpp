@@ -192,6 +192,13 @@ void draw()
     for (int i = 0; i < H; i++)
     {
         string leftStr = "                        ";
+        if (i == 2) {
+            if (canHold) leftStr = "   [ HOLD PIECE ] (C)   ";
+            else         leftStr = "   \x1b[91m[ HOLD (LOCKED) ]\x1b[0m    ";
+        }
+        else if (i >= 3 && i <= 6) {
+            leftStr = "        " + getPieceRowUI(holdPiece, i - 3) + "        ";
+        }
         if (i == 9)
             leftStr = "     [ CONTROLS ]       ";
         else if (i == 11)
@@ -218,6 +225,19 @@ void draw()
                 s += getColorCode(cell) + BLOCK + "\x1b[0m";
             else
                 s += CELL;
+        }
+        if (i == 2) s += "    \x1b[96mSCORE:\x1b[0m " + to_string(score);
+        if (i == 3) s += "    \x1b[93mLEVEL:\x1b[0m " + to_string(level);
+        if (i == 4) s += "    LINES: " + to_string(linesClearedTotal);
+        if (i == 7) s += "    [ NEXT 3 PIECES ]";
+        if (i >= 8 && i <= 11) {
+            string nextUI = "   ";
+            queue<Piece*> tempQ = nextQueue;
+            while (!tempQ.empty()) {
+                nextUI += getPieceRowUI(tempQ.front(), i - 8) + "  ";
+                tempQ.pop();
+            }
+            s += nextUI;
         }
         s += "\n";
     }
