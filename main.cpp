@@ -300,6 +300,14 @@ void draw()
             else
                 s += CELL;
         }
+
+        if (i == 2)
+            s += "    \x1b[96mSCORE:\x1b[0m " + to_string(score);
+        if (i == 3)
+            s += "    \x1b[93mLEVEL:\x1b[0m " + to_string(level);
+        if (i == 4)
+            s += "    LINES: " + to_string(linesClearedTotal);
+
         s += "\n";
     }
     cout << s;
