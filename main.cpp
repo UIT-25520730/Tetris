@@ -323,6 +323,7 @@ int main()
             if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
                 int droppedCells = 0;
                 while (canMove(0, 1, x, y)) { y++; droppedCells++; }
+                score += droppedCells * 2;
                 block2Board();
                 removeLine();
                 delete currentPiece;
