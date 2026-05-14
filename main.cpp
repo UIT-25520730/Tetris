@@ -245,12 +245,32 @@ Piece *getRandomPiece()
     }
 }
 
+void spawnNextPiece() {
+    if (nextQueue.empty()) nextQueue.push(getRandomPiece());
+    currentPiece = nextQueue.front();
+    nextQueue.pop();
+    nextQueue.push(getRandomPiece());
+    x = 4; y = 0;
+    canHold = true;
+}
+
+void initGame() {
+    score = 0; level = 1; linesClearedTotal = 0; speed = 400;
+    for (int i = 0; i < H; i++)
+        for (int j = 0; j < W; j++)
+            board[i][j] = ((i == H - 1) || (j == 0) || (j == W - 1)) ? '#' : ' ';
+    while (!nextQueue.empty()) { delete nextQueue.front(); nextQueue.pop(); }
+    if (holdPiece != NULL) { delete holdPiece; holdPiece = NULL; }
+    for (int i = 0; i < 3; i++) nextQueue.push(getRandomPiece());
+    spawnNextPiece();
+}
+
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
     srand((unsigned)time(0));
     initBoard();
-    currentPiece = getRandomPiece();
+    initGame();
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo(hOut, &cursorInfo);
