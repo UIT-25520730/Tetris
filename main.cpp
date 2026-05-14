@@ -174,11 +174,18 @@ void draw()
     gotoxy(0, 0);
     string s = "";
     char renderBoard[H][W];
+
     for (int i = 0; i < H; i++)
         for (int j = 0; j < W; j++)
             renderBoard[i][j] = board[i][j];
-    if (currentPiece != NULL)
-    {
+
+    if (currentPiece != NULL){
+        int ghostY = y;
+        while (canMove(0, 1, x, ghostY)) ghostY++;
+        for (int i=0; i<4; i++) for (int j=0; j<4; j++)
+            if (currentPiece->getCell(i, j) != ' ' && ghostY + i < H)
+                if (renderBoard[ghostY+i][x+j] == ' ') renderBoard[ghostY+i][x+j] = 'G'; 
+                
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 if (currentPiece->getCell(i, j) != ' ' && y + i < H)
@@ -204,11 +211,14 @@ void draw()
         else if (i == 17)
             leftStr = "     Q   : Quit Game    ";
         s += leftStr;
+
         for (int j = 0; j < W; j++)
         {
             char cell = renderBoard[i][j];
             if (cell == '#')
                 s += getColorCode(cell) + WALL + "\x1b[0m";
+            else if (cell == 'G') 
+                s += getColorCode(cell) + GHOST + "\x1b[0m";
             else if (cell != ' ')
                 s += getColorCode(cell) + BLOCK + "\x1b[0m";
             else
