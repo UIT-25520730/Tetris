@@ -3,6 +3,7 @@
 #include <ctime>
 #include <string>
 #include <conio.h>
+#include <queue>
 
 using namespace std;
 
@@ -53,6 +54,10 @@ class PieceL : public Piece { public: PieceL() { reset(); } void reset() overrid
 
 int x = 5, y = 0, speed = 400;
 Piece *currentPiece = NULL;
+
+queue<Piece*> nextQueue;
+Piece* holdPiece = NULL;
+bool canHold = true;
 
 void gotoxy(int x, int y)
 {
