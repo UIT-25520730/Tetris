@@ -35,8 +35,7 @@ public:
     virtual void reset() = 0;
 };
 
-class PieceI : public Piece { public: PieceI() { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[3][1]='I'; } };
-class PieceO : public Piece {
+class PieceI : public Piece { public: PieceI() { reset(); } void reset() override { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[3][1]='I'; } };class PieceO : public Piece {
 public:
     PieceO() { reset(); }
     void reset() override { clearShape(); shape[1][1]=shape[1][2]=shape[2][1]=shape[2][2]='O'; }
@@ -44,11 +43,11 @@ public:
         for (int i=0; i<4; i++) for(int j=0; j<4; j++) dest[i][j] = shape[i][j];
     }
 };
-class PieceT : public Piece { public: PieceT() { clearShape(); shape[1][0]=shape[1][1]=shape[1][2]=shape[0][1]='T'; } };
-class PieceS : public Piece { public: PieceS() { clearShape(); shape[1][0]=shape[1][1]=shape[0][1]=shape[0][2]='S'; } };
-class PieceZ : public Piece { public: PieceZ() { clearShape(); shape[0][0]=shape[0][1]=shape[1][1]=shape[1][2]='Z'; } };
-class PieceJ : public Piece { public: PieceJ() { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][0]='J'; } };
-class PieceL : public Piece { public: PieceL() { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][2]='L'; } };
+class PieceT : public Piece { public: PieceT() { reset(); } void reset() override { clearShape(); shape[1][0]=shape[1][1]=shape[1][2]=shape[0][1]='T'; } };
+class PieceS : public Piece { public: PieceS() { reset(); } void reset() override { clearShape(); shape[1][0]=shape[1][1]=shape[0][1]=shape[0][2]='S'; } };
+class PieceZ : public Piece { public: PieceZ() { reset(); } void reset() override { clearShape(); shape[0][0]=shape[0][1]=shape[1][1]=shape[1][2]='Z'; } };
+class PieceJ : public Piece { public: PieceJ() { reset(); } void reset() override { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][0]='J'; } };
+class PieceL : public Piece { public: PieceL() { reset(); } void reset() override { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][2]='L'; } };
 
 int x = 5, y = 0, speed = 400;
 Piece* currentPiece = NULL;
