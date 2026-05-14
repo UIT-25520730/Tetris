@@ -138,6 +138,22 @@ string getColorCode(char c)
     }
 }
 
+string getPieceRowUI(Piece *p, int row)
+{
+    if (p == NULL)
+        return "        ";
+    string res = "";
+    for (int j = 0; j < 4; j++)
+    {
+        char c = p->getCell(row, j);
+        if (c != ' ')
+            res += getColorCode(c) + BLOCK + "\x1b[0m";
+        else
+            res += "  ";
+    }
+    return res;
+}
+
 void initBoard()
 {
     for (int i = 0; i < H; i++)
