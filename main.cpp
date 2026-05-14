@@ -14,22 +14,30 @@ using namespace std;
 #define GHOST "░░"
 
 char board[H][W];
+int score = 0, level = 1, linesClearedTotal = 0;
 
-
-
-class Piece {
+class Piece
+{
 protected:
     char shape[4][4];
+
 public:
     virtual ~Piece() {}
     char getCell(int i, int j) const { return shape[i][j]; }
-    void clearShape() { for (int i=0; i<4; i++) for (int j=0; j<4; j++) shape[i][j] = ' '; }
-    virtual void getRotatedShape(char dest[4][4]) const {
+    void clearShape()
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                shape[i][j] = ' ';
+    }
+    virtual void getRotatedShape(char dest[4][4]) const
+    {
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 dest[j][3 - i] = shape[i][j];
     }
-    void applyRotation(char newShape[4][4]) {
+    void applyRotation(char newShape[4][4])
+    {
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 shape[i][j] = newShape[i][j];
@@ -37,19 +45,82 @@ public:
     virtual void reset() = 0;
 };
 
-class PieceI : public Piece { public: PieceI() { reset(); } void reset() override { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[3][1]='I'; } };class PieceO : public Piece {
+class PieceI : public Piece
+{
 public:
-    PieceO() { reset(); }
-    void reset() override { clearShape(); shape[1][1]=shape[1][2]=shape[2][1]=shape[2][2]='O'; }
-    void getRotatedShape(char dest[4][4]) const override {
-        for (int i=0; i<4; i++) for(int j=0; j<4; j++) dest[i][j] = shape[i][j];
+    PieceI() { reset(); }
+    void reset() override
+    {
+        clearShape();
+        shape[0][1] = shape[1][1] = shape[2][1] = shape[3][1] = 'I';
     }
 };
-class PieceT : public Piece { public: PieceT() { reset(); } void reset() override { clearShape(); shape[1][0]=shape[1][1]=shape[1][2]=shape[0][1]='T'; } };
-class PieceS : public Piece { public: PieceS() { reset(); } void reset() override { clearShape(); shape[1][0]=shape[1][1]=shape[0][1]=shape[0][2]='S'; } };
-class PieceZ : public Piece { public: PieceZ() { reset(); } void reset() override { clearShape(); shape[0][0]=shape[0][1]=shape[1][1]=shape[1][2]='Z'; } };
-class PieceJ : public Piece { public: PieceJ() { reset(); } void reset() override { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][0]='J'; } };
-class PieceL : public Piece { public: PieceL() { reset(); } void reset() override { clearShape(); shape[0][1]=shape[1][1]=shape[2][1]=shape[2][2]='L'; } };
+class PieceO : public Piece
+{
+public:
+    PieceO() { reset(); }
+    void reset() override
+    {
+        clearShape();
+        shape[1][1] = shape[1][2] = shape[2][1] = shape[2][2] = 'O';
+    }
+    void getRotatedShape(char dest[4][4]) const override
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                dest[i][j] = shape[i][j];
+    }
+};
+class PieceT : public Piece
+{
+public:
+    PieceT() { reset(); }
+    void reset() override
+    {
+        clearShape();
+        shape[1][0] = shape[1][1] = shape[1][2] = shape[0][1] = 'T';
+    }
+};
+class PieceS : public Piece
+{
+public:
+    PieceS() { reset(); }
+    void reset() override
+    {
+        clearShape();
+        shape[1][0] = shape[1][1] = shape[0][1] = shape[0][2] = 'S';
+    }
+};
+class PieceZ : public Piece
+{
+public:
+    PieceZ() { reset(); }
+    void reset() override
+    {
+        clearShape();
+        shape[0][0] = shape[0][1] = shape[1][1] = shape[1][2] = 'Z';
+    }
+};
+class PieceJ : public Piece
+{
+public:
+    PieceJ() { reset(); }
+    void reset() override
+    {
+        clearShape();
+        shape[0][1] = shape[1][1] = shape[2][1] = shape[2][0] = 'J';
+    }
+};
+class PieceL : public Piece
+{
+public:
+    PieceL() { reset(); }
+    void reset() override
+    {
+        clearShape();
+        shape[0][1] = shape[1][1] = shape[2][1] = shape[2][2] = 'L';
+    }
+};
 
 int x = 5, y = 0, speed = 400;
 Piece *currentPiece = NULL;
@@ -152,6 +223,7 @@ bool canMove(int dx, int dy, int testX, int testY, char customShape[4][4] = NULL
 
 void removeLine()
 {
+    int linesThisTurn = 0;
     for (int i = H - 2; i > 0; i--)
     {
         bool full = true;
@@ -160,12 +232,26 @@ void removeLine()
                 full = false;
         if (full)
         {
+            linesThisTurn++;
             for (int ii = i; ii > 0; ii--)
                 for (int jj = 1; jj < W - 1; jj++)
                     board[ii][jj] = board[ii - 1][jj];
             i++;
-            speed = max(100, speed - 10);
         }
+    }
+    if (linesThisTurn > 0)
+    {
+        linesClearedTotal += linesThisTurn;
+        if (linesThisTurn == 1)
+            score += 100 * level;
+        else if (linesThisTurn == 2)
+            score += 300 * level;
+        else if (linesThisTurn == 3)
+            score += 500 * level;
+        else if (linesThisTurn == 4)
+            score += 800 * level;
+        level = (linesClearedTotal / 10) + 1;
+        speed = max(50, 400 - (level - 1) * 30);
     }
 }
 
@@ -301,16 +387,22 @@ int main()
                         _getch();
                 }
             }
-            if (GetAsyncKeyState(VK_UP) & 0x8000) {
+            if (GetAsyncKeyState(VK_UP) & 0x8000)
+            {
                 char rotated[4][4];
                 currentPiece->getRotatedShape(rotated);
-                if (canMove(0, 0, x, y, rotated)) {
+                if (canMove(0, 0, x, y, rotated))
+                {
                     currentPiece->applyRotation(rotated);
-                    changed = true; FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+                    changed = true;
+                    FlushConsoleInputBuffer(hIn);
+                    while (_kbhit())
+                        _getch();
                 }
             }
 
-            if (GetAsyncKeyState('Q') & 0x8000) break;
+            if (GetAsyncKeyState('Q') & 0x8000)
+                break;
 
             lastMove = GetTickCount();
             block2Board();
