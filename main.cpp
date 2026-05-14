@@ -320,6 +320,19 @@ int main()
                 }
             }
 
+            if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
+                int droppedCells = 0;
+                while (canMove(0, 1, x, y)) { y++; droppedCells++; }
+                block2Board();
+                removeLine();
+                delete currentPiece;
+                spawnNextPiece();
+                if (!canMove(0, 0, x, y)) { draw(); break; }
+                changed = true;
+                lastFall = GetTickCount();
+                FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+            }
+
             if (GetAsyncKeyState('Q') & 0x8000) break;
 
             lastMove = GetTickCount();
