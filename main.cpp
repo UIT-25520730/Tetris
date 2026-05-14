@@ -3,6 +3,7 @@
 #include <ctime>
 #include <string>
 #include <conio.h>
+#include <queue>
 
 using namespace std;
 
@@ -53,6 +54,10 @@ class PieceL : public Piece { public: PieceL() { reset(); } void reset() overrid
 
 int x = 5, y = 0, speed = 400;
 Piece *currentPiece = NULL;
+
+queue<Piece*> nextQueue;
+Piece* holdPiece = NULL;
+bool canHold = true;
 
 void gotoxy(int x, int y)
 {
@@ -194,6 +199,13 @@ void draw()
     for (int i = 0; i < H; i++)
     {
         string leftStr = "                        ";
+        if (i == 2) {
+            if (canHold) leftStr = "   [ HOLD PIECE ] (C)   ";
+            else         leftStr = "   \x1b[91m[ HOLD (LOCKED) ]\x1b[0m    ";
+        }
+        else if (i >= 3 && i <= 6) {
+            leftStr = "        " + getPieceRowUI(holdPiece, i - 3) + "        ";
+        }
         if (i == 9)
             leftStr = "     [ CONTROLS ]       ";
         else if (i == 11)
@@ -224,6 +236,19 @@ void draw()
             else
                 s += CELL;
         }
+        if (i == 2) s += "    \x1b[96mSCORE:\x1b[0m " + to_string(score);
+        if (i == 3) s += "    \x1b[93mLEVEL:\x1b[0m " + to_string(level);
+        if (i == 4) s += "    LINES: " + to_string(linesClearedTotal);
+        if (i == 7) s += "    [ NEXT 3 PIECES ]";
+        if (i >= 8 && i <= 11) {
+            string nextUI = "   ";
+            queue<Piece*> tempQ = nextQueue;
+            while (!tempQ.empty()) {
+                nextUI += getPieceRowUI(tempQ.front(), i - 8) + "  ";
+                tempQ.pop();
+            }
+            s += nextUI;
+        }
         s += "\n";
     }
     cout << s;
@@ -250,12 +275,32 @@ Piece *getRandomPiece()
     }
 }
 
+void spawnNextPiece() {
+    if (nextQueue.empty()) nextQueue.push(getRandomPiece());
+    currentPiece = nextQueue.front();
+    nextQueue.pop();
+    nextQueue.push(getRandomPiece());
+    x = 4; y = 0;
+    canHold = true;
+}
+
+void initGame() {
+    score = 0; level = 1; linesClearedTotal = 0; speed = 400;
+    for (int i = 0; i < H; i++)
+        for (int j = 0; j < W; j++)
+            board[i][j] = ((i == H - 1) || (j == 0) || (j == W - 1)) ? '#' : ' ';
+    while (!nextQueue.empty()) { delete nextQueue.front(); nextQueue.pop(); }
+    if (holdPiece != NULL) { delete holdPiece; holdPiece = NULL; }
+    for (int i = 0; i < 3; i++) nextQueue.push(getRandomPiece());
+    spawnNextPiece();
+}
+
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
     srand((unsigned)time(0));
     initBoard();
-    currentPiece = getRandomPiece();
+    initGame();
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo(hOut, &cursorInfo);
@@ -298,6 +343,25 @@ int main()
                     FlushConsoleInputBuffer(hIn);
                     while (_kbhit())
                         _getch();
+                }
+            }
+            if (GetAsyncKeyState('C') & 0x8000) {
+                if (canHold) {
+                    if (holdPiece == NULL) {
+                        holdPiece = currentPiece;
+                        holdPiece->reset();
+                        spawnNextPiece();
+                    }
+                    else {
+                        Piece* temp = currentPiece;
+                        currentPiece = holdPiece;
+                        holdPiece = temp;
+                        holdPiece->reset();
+                        x = 4; y = 0;
+                        canHold = false;
+                    }
+                    changed = true;
+                    FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
                 }
             }
             if (GetAsyncKeyState(VK_DOWN) & 0x8000)
