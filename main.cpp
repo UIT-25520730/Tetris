@@ -161,9 +161,14 @@ SetConsoleCursorInfo(hOut, &cursorInfo);
             while (_kbhit()) _getch();
             }
             }
-
-
-
+            if (GetAsyncKeyState(VK_UP) & 0x8000) {
+                char rotated[4][4];
+                currentPiece->getRotatedShape(rotated);
+                if (canMove(0, 0, x, y, rotated)) {
+                    currentPiece->applyRotation(rotated);
+                    changed = true; FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+                }
+            }
 
             if (GetAsyncKeyState('Q') & 0x8000) break;
 
