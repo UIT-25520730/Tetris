@@ -6,11 +6,12 @@
 
 using namespace std;
 
-#define H 20
-#define W 15
+#define H 22
+#define W 12
 #define CELL "  "
 #define BLOCK "██"
 #define WALL "██"
+#define GHOST "░░"
 
 char board[H][W];
 
@@ -216,20 +217,49 @@ void draw()
 {
     gotoxy(0, 0);
     string s = "";
+    char renderBoard[H][W];
+    for (int i = 0; i < H; i++)
+        for (int j = 0; j < W; j++)
+            renderBoard[i][j] = board[i][j];
+    if (currentPiece != NULL)
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                if (currentPiece->getCell(i, j) != ' ' && y + i < H)
+                    renderBoard[y + i][x + j] = currentPiece->getCell(i, j);
+    }
     for (int i = 0; i < H; i++)
     {
+        string leftStr = "                        ";
+        if (i == 9)
+            leftStr = "     [ CONTROLS ]       ";
+        else if (i == 11)
+            leftStr = "   < / > : Di chuyen    ";
+        else if (i == 12)
+            leftStr = "     ^   : Xoay block   ";
+        else if (i == 13)
+            leftStr = "     v   : Roi nhanh    ";
+        else if (i == 14)
+            leftStr = "   SPACE : Hard Drop    ";
+        else if (i == 15)
+            leftStr = "     C   : Hold Piece   ";
+        else if (i == 16)
+            leftStr = "     P   : Pause Game   ";
+        else if (i == 17)
+            leftStr = "     Q   : Quit Game    ";
+        s += leftStr;
         for (int j = 0; j < W; j++)
         {
-            if (board[i][j] == '#')
-                s += WALL;
-            else if (board[i][j] != ' ')
-                s += BLOCK;
+            char cell = renderBoard[i][j];
+            if (cell == '#')
+                s += getColorCode(cell) + WALL + "\x1b[0m";
+            else if (cell != ' ')
+                s += getColorCode(cell) + BLOCK + "\x1b[0m";
             else
                 s += CELL;
         }
         s += "\n";
     }
-
     cout << s;
 }
 
