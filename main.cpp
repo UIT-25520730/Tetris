@@ -315,6 +315,25 @@ int main()
                         _getch();
                 }
             }
+            if (GetAsyncKeyState('C') & 0x8000) {
+                if (canHold) {
+                    if (holdPiece == NULL) {
+                        holdPiece = currentPiece;
+                        holdPiece->reset();
+                        spawnNextPiece();
+                    }
+                    else {
+                        Piece* temp = currentPiece;
+                        currentPiece = holdPiece;
+                        holdPiece = temp;
+                        holdPiece->reset();
+                        x = 4; y = 0;
+                        canHold = false;
+                    }
+                    changed = true;
+                    FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+                }
+            }
             if (GetAsyncKeyState(VK_DOWN) & 0x8000)
             {
                 if (canMove(0, 1, x, y))
