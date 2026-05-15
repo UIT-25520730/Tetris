@@ -397,10 +397,13 @@ int main()
     GetConsoleMode(hIn, &mode);
     SetConsoleMode(hIn, mode & ~ENABLE_QUICK_EDIT_MODE);
 
-    DWORD lastFall = GetTickCount();
-    DWORD lastMove = GetTickCount();
-
-    while (true)
+    bool playAgain = true;
+    while (playAgain) {
+        initGame();
+        draw();           
+        DWORD lastFall = GetTickCount();
+        DWORD lastMove = GetTickCount();
+        while (true)
     {
         bool changed = false;
 
@@ -526,6 +529,14 @@ int main()
             draw();
 
         Sleep(10);
+    }
+        gotoxy(13, H / 2); cout << "   \x1b[91mGAME OVER!\x1b[0m   ";
+        gotoxy(13, H / 2 + 1); cout << " Play Again? (Y/N): ";
+        char choice;
+        do { choice = _getch(); } while (choice != 'y' && choice != 'Y' && choice != 'n' && choice != 'N');
+        if (choice == 'n' || choice == 'N') playAgain = false;
+        delete currentPiece;
+        system("cls");
     }
     return 0;
 }
