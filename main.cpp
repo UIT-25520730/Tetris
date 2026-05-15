@@ -397,10 +397,13 @@ int main()
     GetConsoleMode(hIn, &mode);
     SetConsoleMode(hIn, mode & ~ENABLE_QUICK_EDIT_MODE);
 
-    DWORD lastFall = GetTickCount();
-    DWORD lastMove = GetTickCount();
-
-    while (true)
+    bool playAgain = true;
+    while (playAgain) {
+        initGame();
+        draw();           
+        DWORD lastFall = GetTickCount();
+        DWORD lastMove = GetTickCount();
+        while (true)
     {
         bool changed = false;
 
@@ -474,7 +477,17 @@ int main()
                         _getch();
                 }
             }
-
+            if (GetAsyncKeyState('P') & 0x8000) {
+                gotoxy(15, H / 2); cout << " \x1b[93m[ PAUSED ]\x1b[0m ";
+                Sleep(300);
+                FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+                while (!(GetAsyncKeyState('P') & 0x8000)) { Sleep(50); }
+                gotoxy(15, H / 2); cout << "            ";
+                lastMove = GetTickCount();
+                lastFall = GetTickCount();
+                changed = true;
+                FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+            }
             if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
                 int droppedCells = 0;
                 while (canMove(0, 1, x, y)) { y++; droppedCells++; }
@@ -526,6 +539,14 @@ int main()
             draw();
 
         Sleep(10);
+    }
+        gotoxy(13, H / 2); cout << "   \x1b[91mGAME OVER!\x1b[0m   ";
+        gotoxy(13, H / 2 + 1); cout << " Play Again? (Y/N): ";
+        char choice;
+        do { choice = _getch(); } while (choice != 'y' && choice != 'Y' && choice != 'n' && choice != 'N');
+        if (choice == 'n' || choice == 'N') playAgain = false;
+        delete currentPiece;
+        system("cls");
     }
     return 0;
 }
