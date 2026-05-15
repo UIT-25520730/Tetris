@@ -477,7 +477,17 @@ int main()
                         _getch();
                 }
             }
-
+            if (GetAsyncKeyState('P') & 0x8000) {
+                gotoxy(15, H / 2); cout << " \x1b[93m[ PAUSED ]\x1b[0m ";
+                Sleep(300);
+                FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+                while (!(GetAsyncKeyState('P') & 0x8000)) { Sleep(50); }
+                gotoxy(15, H / 2); cout << "            ";
+                lastMove = GetTickCount();
+                lastFall = GetTickCount();
+                changed = true;
+                FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
+            }
             if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
                 int droppedCells = 0;
                 while (canMove(0, 1, x, y)) { y++; droppedCells++; }
