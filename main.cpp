@@ -464,7 +464,7 @@ int main()
                         _getch();
                 }
             }
-            if (GetAsyncKeyState(VK_UP) & 0x8000)
+            if (GetAsyncKeyState(VK_UP) & 1)
             {
                 char rotated[4][4];
                 currentPiece->getRotatedShape(rotated);
