@@ -521,9 +521,7 @@ int main()
                 block2Board();
                 removeLine();
                 delete currentPiece;
-                x = 5;
-                y = 0;
-                currentPiece = getRandomPiece();
+              spawnNextPiece();
                 if (!canMove(0, 0, x, y))
                 {
                     system("cls");
