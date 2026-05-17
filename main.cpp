@@ -4,6 +4,8 @@
 #include <string>
 #include <conio.h>
 #include <queue>
+#include <fstream>
+#include <vector>   
 
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib") 
@@ -19,7 +21,7 @@ using namespace std;
 
 char board[H][W];
 int score = 0, level = 1, linesClearedTotal = 0;
-
+vector<int> highScores;
 class Piece
 {
 protected:
@@ -138,6 +140,45 @@ void gotoxy(int x, int y)
     COORD c = {(short)(x * 2), (short)y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
+
+void loadHighScores() {
+    highScores.clear();
+    ifstream file("highscore.txt");
+    int s;
+    while (file >> s) {
+        highScores.push_back(s);
+    }
+    file.close();
+    
+    while (highScores.size() < 5) {
+        highScores.push_back(0);
+    }
+}
+
+void saveHighScore(int currentScore) {
+    highScores.push_back(currentScore); 
+    
+    for (size_t i = 0; i < highScores.size(); i++) {
+        for (size_t j = i + 1; j < highScores.size(); j++) {
+            if (highScores[i] < highScores[j]) {
+                int temp = highScores[i];
+                highScores[i] = highScores[j];
+                highScores[j] = temp;
+            }
+        }
+    }
+    
+    if (highScores.size() > 5) {
+        highScores.resize(5);
+    }
+    
+    ofstream file("highscore.txt");
+    for (int s : highScores) {
+        file << s << "\n";
+    }
+    file.close();
+}
+
 
 void enableANSIColors(HANDLE hOut)
 {
@@ -340,6 +381,15 @@ void draw()
             }
             s += nextUI;
         }
+        if (i == 13) s += "    \x1b[91m[ TOP 5 HIGH SCORES ]\x1b[0m";
+        
+        
+        if (i >= 14 && i <= 18) {
+            int rank = i - 13; 
+            if ((size_t)(rank - 1) < highScores.size()) {
+                s += "     " + to_string(rank) + ". " + to_string(highScores[rank - 1]);
+            }
+        }
         s += "\n";
     }
     cout << s;
@@ -391,6 +441,7 @@ int main()
     PlaySound(TEXT("bgm.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
     SetConsoleOutputCP(CP_UTF8);
     srand((unsigned)time(0));
+    loadHighScores();
     initBoard();
     initGame();
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -502,13 +553,20 @@ int main()
                 removeLine();
                 delete currentPiece;
                 spawnNextPiece();
-                if (!canMove(0, 0, x, y)) { draw(); break; }
+                if (!canMove(0, 0, x, y)) { 
+                    saveHighScore(score);
+                    draw();
+                    break;
+                }
                 changed = true;
                 lastFall = GetTickCount();
                 FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
             }
 
-            if (GetAsyncKeyState('Q') & 0x8000) break;
+            if (GetAsyncKeyState('Q') & 0x8000) {
+            saveHighScore(score); // <- Thêm dòng này ở đây
+            break;
+            }
 
             lastMove = GetTickCount();
             block2Board();
@@ -530,6 +588,7 @@ int main()
               spawnNextPiece();
                 if (!canMove(0, 0, x, y))
                 {
+                    saveHighScore(score);
                     system("cls");
                     cout << "GAME OVER!";
                     break;
