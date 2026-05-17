@@ -381,6 +381,15 @@ void draw()
             }
             s += nextUI;
         }
+        if (i == 13) s += "    \x1b[91m[ TOP 5 HIGH SCORES ]\x1b[0m";
+        
+        
+        if (i >= 14 && i <= 18) {
+            int rank = i - 13; 
+            if ((size_t)(rank - 1) < highScores.size()) {
+                s += "     " + to_string(rank) + ". " + to_string(highScores[rank - 1]);
+            }
+        }
         s += "\n";
     }
     cout << s;
@@ -432,6 +441,7 @@ int main()
     PlaySound(TEXT("bgm.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
     SetConsoleOutputCP(CP_UTF8);
     srand((unsigned)time(0));
+    loadHighScores();
     initBoard();
     initGame();
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -543,13 +553,20 @@ int main()
                 removeLine();
                 delete currentPiece;
                 spawnNextPiece();
-                if (!canMove(0, 0, x, y)) { draw(); break; }
+                if (!canMove(0, 0, x, y)) { 
+                    saveHighScore(score);
+                    draw();
+                    break;
+                }
                 changed = true;
                 lastFall = GetTickCount();
                 FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
             }
 
-            if (GetAsyncKeyState('Q') & 0x8000) break;
+            if (GetAsyncKeyState('Q') & 0x8000) {
+            saveHighScore(score); // <- Thêm dòng này ở đây
+            break;
+            }
 
             lastMove = GetTickCount();
             block2Board();
@@ -571,6 +588,7 @@ int main()
               spawnNextPiece();
                 if (!canMove(0, 0, x, y))
                 {
+                    saveHighScore(score);
                     system("cls");
                     cout << "GAME OVER!";
                     break;
