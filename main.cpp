@@ -6,9 +6,14 @@
 #include <queue>
 #include <fstream>
 #include <vector>   
+#include <vector>
+#include <algorithm>
+#include <random>
 
-#include <mmsystem.h>
-#pragma comment(lib, "winmm.lib") 
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
 
 using namespace std;
 
@@ -21,7 +26,11 @@ using namespace std;
 
 char board[H][W];
 int score = 0, level = 1, linesClearedTotal = 0;
+
 vector<int> highScores;
+
+vector<int> pieceBag;
+
 class Piece
 {
 protected:
@@ -290,7 +299,7 @@ void removeLine()
     }
     if (linesThisTurn > 0)
     {
-        PlaySound(TEXT("clear.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+        Beep(800, 150);
         linesClearedTotal += linesThisTurn;
         if (linesThisTurn == 1)
             score += 100 * level;
@@ -396,25 +405,50 @@ void draw()
     cout << s;
 }
 
-Piece *getRandomPiece()
+void refillBag()
 {
-    switch (rand() % 7)
+    pieceBag = { 0,1,2,3,4,5,6 };
+
+    shuffle(pieceBag.begin(), pieceBag.end(), default_random_engine(rand()));
+}
+
+Piece* createPieceByType(int type)
+{
+    switch (type)
     {
     case 0:
         return new PieceI();
+
     case 1:
         return new PieceO();
+
     case 2:
         return new PieceT();
+
     case 3:
         return new PieceS();
+
     case 4:
         return new PieceZ();
+
     case 5:
         return new PieceJ();
+
     default:
         return new PieceL();
     }
+}
+
+Piece* getRandomPiece()
+{
+    if (pieceBag.empty())
+        refillBag();
+
+    int type = pieceBag.back();
+
+    pieceBag.pop_back();
+
+    return createPieceByType(type);
 }
 
 void spawnNextPiece() {
@@ -526,14 +560,34 @@ int main()
             {
                 char rotated[4][4];
                 currentPiece->getRotatedShape(rotated);
+
+                // Rotate normally
                 if (canMove(0, 0, x, y, rotated))
                 {
                     currentPiece->applyRotation(rotated);
                     changed = true;
-                    FlushConsoleInputBuffer(hIn);
-                    while (_kbhit())
-                        _getch();
                 }
+
+                // Wall kick left
+                else if (canMove(-1, 0, x, y, rotated))
+                {
+                    x--;
+                    currentPiece->applyRotation(rotated);
+                    changed = true;
+                }
+
+                // Wall kick right
+                else if (canMove(1, 0, x, y, rotated))
+                {
+                    x++;
+                    currentPiece->applyRotation(rotated);
+                    changed = true;
+                }
+
+                FlushConsoleInputBuffer(hIn);
+
+                while (_kbhit())
+                    _getch();
             }
             if (GetAsyncKeyState('P') & 1) {
                 gotoxy(15, H / 2); cout << " \x1b[93m[ PAUSED ]\x1b[0m ";
