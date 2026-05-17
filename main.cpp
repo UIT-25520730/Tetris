@@ -210,6 +210,10 @@ string getColorCode(char c)
         return "\x1b[90m";
     case '#':
         return "\x1b[37m";
+    case 'F': 
+        return "\x1b[97m\x1b[107m"; 
+    case 'E': 
+        return "\x1b[0m";
     default:
         return "\x1b[0m";
     }
@@ -268,41 +272,6 @@ bool canMove(int dx, int dy, int testX, int testY, char customShape[4][4] = NULL
             }
         }
     return true;
-}
-
-void removeLine()
-{
-    int linesThisTurn = 0;
-    for (int i = H - 2; i > 0; i--)
-    {
-        bool full = true;
-        for (int j = 1; j < W - 1; j++)
-            if (board[i][j] == ' ')
-                full = false;
-        if (full)
-        {
-            linesThisTurn++;
-            for (int ii = i; ii > 0; ii--)
-                for (int jj = 1; jj < W - 1; jj++)
-                    board[ii][jj] = board[ii - 1][jj];
-            i++;
-        }
-    }
-    if (linesThisTurn > 0)
-    {
-        PlaySound(TEXT("clear.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
-        linesClearedTotal += linesThisTurn;
-        if (linesThisTurn == 1)
-            score += 100 * level;
-        else if (linesThisTurn == 2)
-            score += 300 * level;
-        else if (linesThisTurn == 3)
-            score += 500 * level;
-        else if (linesThisTurn == 4)
-            score += 800 * level;
-        level = (linesClearedTotal / 10) + 1;
-        speed = max(100, 1000 - (level - 1) * 30);
-    }
 }
 
 void draw()
@@ -364,6 +333,10 @@ void draw()
                 s += getColorCode(cell) + WALL + "\x1b[0m";
             else if (cell == 'G') 
                 s += getColorCode(cell) + GHOST + "\x1b[0m";
+            else if (cell == 'F') 
+                s += getColorCode(cell) + "██" + "\x1b[0m";
+            else if (cell == 'E') 
+                s += CELL;
             else if (cell != ' ')
                 s += getColorCode(cell) + BLOCK + "\x1b[0m";
             else
@@ -394,6 +367,80 @@ void draw()
         s += "\n";
     }
     cout << s;
+}
+
+void removeLine()
+{
+    vector<int> fullLines;
+    for (int i = H - 2; i > 0; i--)
+    {
+        bool full = true;
+        for (int j = 1; j < W - 1; j++)
+        {
+            if (board[i][j] == ' ')
+                full = false;
+        }
+        if (full)
+        {
+            fullLines.push_back(i);
+        }
+    }
+
+    int linesThisTurn = fullLines.size();
+
+    if (linesThisTurn > 0)
+    {
+        Piece* tempPiece = currentPiece;
+        currentPiece = NULL; 
+
+        for (int flash = 0; flash < 2; flash++)
+        {
+            for (int row : fullLines)
+                for (int j = 1; j < W - 1; j++) board[row][j] = (board[row][j] != ' ') ? 'F' : ' ';
+            draw();
+            Sleep(80);
+
+            // Nhịp tắt: Ẩn tạm thời các hàng đầy bằng cách đổi thành ' '
+            for (int row : fullLines)
+                for (int j = 1; j < W - 1; j++) board[row][j] = (board[row][j] == 'F') ? 'E' : ' '; 
+            draw();
+            Sleep(80);
+        }
+        
+        for (int i = 1; i < H - 1; i++)
+        {
+            for (int j = 1; j < W - 1; j++)
+            {
+                if (board[i][j] == 'F' || board[i][j] == 'E') board[i][j] = '#'; 
+            }
+        }
+        currentPiece = tempPiece;
+
+        
+        for (int i = H - 2; i > 0; i--)
+        {
+            bool full = true;
+            for (int j = 1; j < W - 1; j++)
+                if (board[i][j] == ' ') full = false;
+
+            if (full)
+            {
+                for (int ii = i; ii > 0; ii--)
+                    for (int jj = 1; jj < W - 1; jj++)
+                        board[ii][jj] = board[ii - 1][jj];
+                i++; 
+            }
+        }
+        PlaySound(TEXT("clearline.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+        linesClearedTotal += linesThisTurn;
+        if (linesThisTurn == 1)      score += 100 * level;
+        else if (linesThisTurn == 2) score += 300 * level;
+        else if (linesThisTurn == 3) score += 500 * level;
+        else if (linesThisTurn == 4) score += 800 * level;
+
+        level = (linesClearedTotal / 10) + 1;
+        speed = max(100, 1000 - (level - 1) * 30);
+    }
 }
 
 Piece *getRandomPiece()
@@ -584,9 +631,9 @@ int main()
             else
             {
                 block2Board();
-                removeLine();
-                delete currentPiece;
-              spawnNextPiece();
+                removeLine();       
+                delete currentPiece; 
+                spawnNextPiece();
                 if (!canMove(0, 0, x, y))
                 {
                     saveHighScore(score);
