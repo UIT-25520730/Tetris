@@ -256,7 +256,7 @@ void removeLine()
         else if (linesThisTurn == 4)
             score += 800 * level;
         level = (linesClearedTotal / 10) + 1;
-        speed = max(50, 400 - (level - 1) * 30);
+        speed = max(100, 1000 - (level - 1) * 30);
     }
 }
 
@@ -373,7 +373,7 @@ void spawnNextPiece() {
 }
 
 void initGame() {
-    score = 0; level = 1; linesClearedTotal = 0; speed = 400;
+    score = 0; level = 1; linesClearedTotal = 0; speed = 1000;
     for (int i = 0; i < H; i++)
         for (int j = 0; j < W; j++)
             board[i][j] = ((i == H - 1) || (j == 0) || (j == W - 1)) ? '#' : ' ';
