@@ -5,6 +5,9 @@
 #include <conio.h>
 #include <queue>
 
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib") 
+
 using namespace std;
 
 #define H 22
@@ -256,7 +259,7 @@ void removeLine()
         else if (linesThisTurn == 4)
             score += 800 * level;
         level = (linesClearedTotal / 10) + 1;
-        speed = max(50, 400 - (level - 1) * 30);
+        speed = max(100, 1000 - (level - 1) * 30);
     }
 }
 
@@ -271,8 +274,10 @@ void draw()
             renderBoard[i][j] = board[i][j];
 
     if (currentPiece != NULL){
+            boardDelBlock();
         int ghostY = y;
         while (canMove(0, 1, x, ghostY)) ghostY++;
+            block2Board();
         for (int i=0; i<4; i++) for (int j=0; j<4; j++)
             if (currentPiece->getCell(i, j) != ' ' && ghostY + i < H)
                 if (renderBoard[ghostY+i][x+j] == ' ') renderBoard[ghostY+i][x+j] = 'G'; 
@@ -371,7 +376,7 @@ void spawnNextPiece() {
 }
 
 void initGame() {
-    score = 0; level = 1; linesClearedTotal = 0; speed = 400;
+    score = 0; level = 1; linesClearedTotal = 0; speed = 1000;
     for (int i = 0; i < H; i++)
         for (int j = 0; j < W; j++)
             board[i][j] = ((i == H - 1) || (j == 0) || (j == W - 1)) ? '#' : ' ';
@@ -383,6 +388,7 @@ void initGame() {
 
 int main()
 {
+    PlaySound(TEXT("bgm.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
     SetConsoleOutputCP(CP_UTF8);
     srand((unsigned)time(0));
     initBoard();
@@ -434,7 +440,7 @@ int main()
                         _getch();
                 }
             }
-            if (GetAsyncKeyState('C') & 0x8000) {
+            if (GetAsyncKeyState('C') & 1) {
                 if (canHold) {
                     if (holdPiece == NULL) {
                         holdPiece = currentPiece;
@@ -464,7 +470,7 @@ int main()
                         _getch();
                 }
             }
-            if (GetAsyncKeyState(VK_UP) & 0x8000)
+            if (GetAsyncKeyState(VK_UP) & 1)
             {
                 char rotated[4][4];
                 currentPiece->getRotatedShape(rotated);
@@ -477,7 +483,7 @@ int main()
                         _getch();
                 }
             }
-            if (GetAsyncKeyState('P') & 0x8000) {
+            if (GetAsyncKeyState('P') & 1) {
                 gotoxy(15, H / 2); cout << " \x1b[93m[ PAUSED ]\x1b[0m ";
                 Sleep(300);
                 FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
@@ -488,7 +494,7 @@ int main()
                 changed = true;
                 FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
             }
-            if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
+            if (GetAsyncKeyState(VK_SPACE) & 1) {
                 int droppedCells = 0;
                 while (canMove(0, 1, x, y)) { y++; droppedCells++; }
                 score += droppedCells * 2;
@@ -521,9 +527,7 @@ int main()
                 block2Board();
                 removeLine();
                 delete currentPiece;
-                x = 5;
-                y = 0;
-                currentPiece = getRandomPiece();
+              spawnNextPiece();
                 if (!canMove(0, 0, x, y))
                 {
                     system("cls");
