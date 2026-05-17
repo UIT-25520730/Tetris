@@ -4,6 +4,8 @@
 #include <string>
 #include <conio.h>
 #include <queue>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -16,6 +18,8 @@ using namespace std;
 
 char board[H][W];
 int score = 0, level = 1, linesClearedTotal = 0;
+
+vector<int> pieceBag;
 
 class Piece
 {
