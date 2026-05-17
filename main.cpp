@@ -4,6 +4,8 @@
 #include <string>
 #include <conio.h>
 #include <queue>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -16,6 +18,8 @@ using namespace std;
 
 char board[H][W];
 int score = 0, level = 1, linesClearedTotal = 0;
+
+vector<int> pieceBag;
 
 class Piece
 {
@@ -342,25 +346,50 @@ void draw()
     cout << s;
 }
 
-Piece *getRandomPiece()
+void refillBag()
 {
-    switch (rand() % 7)
+    pieceBag = { 0,1,2,3,4,5,6 };
+
+    shuffle(pieceBag.begin(), pieceBag.end(), default_random_engine(rand()));
+}
+
+Piece* createPieceByType(int type)
+{
+    switch (type)
     {
     case 0:
         return new PieceI();
+
     case 1:
         return new PieceO();
+
     case 2:
         return new PieceT();
+
     case 3:
         return new PieceS();
+
     case 4:
         return new PieceZ();
+
     case 5:
         return new PieceJ();
+
     default:
         return new PieceL();
     }
+}
+
+Piece* getRandomPiece()
+{
+    if (pieceBag.empty())
+        refillBag();
+
+    int type = pieceBag.back();
+
+    pieceBag.pop_back();
+
+    return createPieceByType(type);
 }
 
 void spawnNextPiece() {
