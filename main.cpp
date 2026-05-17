@@ -5,6 +5,10 @@
 #include <conio.h>
 #include <queue>
 
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
 using namespace std;
 
 #define H 22
@@ -246,6 +250,7 @@ void removeLine()
     }
     if (linesThisTurn > 0)
     {
+        Beep(800, 150);
         linesClearedTotal += linesThisTurn;
         if (linesThisTurn == 1)
             score += 100 * level;
