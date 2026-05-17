@@ -4,6 +4,8 @@
 #include <string>
 #include <conio.h>
 #include <queue>
+#include <fstream>
+#include <vector>   
 
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib") 
@@ -19,7 +21,7 @@ using namespace std;
 
 char board[H][W];
 int score = 0, level = 1, linesClearedTotal = 0;
-
+vector<int> highScores;
 class Piece
 {
 protected:
@@ -137,6 +139,20 @@ void gotoxy(int x, int y)
 {
     COORD c = {(short)(x * 2), (short)y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+}
+
+void loadHighScores() {
+    highScores.clear();
+    ifstream file("highscore.txt");
+    int s;
+    while (file >> s) {
+        highScores.push_back(s);
+    }
+    file.close();
+    
+    while (highScores.size() < 5) {
+        highScores.push_back(0);
+    }
 }
 
 void enableANSIColors(HANDLE hOut)
