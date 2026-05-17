@@ -5,6 +5,9 @@
 #include <conio.h>
 #include <queue>
 
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib") 
+
 using namespace std;
 
 #define H 22
@@ -385,6 +388,7 @@ void initGame() {
 
 int main()
 {
+    PlaySound(TEXT("bgm.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
     SetConsoleOutputCP(CP_UTF8);
     srand((unsigned)time(0));
     initBoard();
