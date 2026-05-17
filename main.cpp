@@ -290,6 +290,7 @@ void removeLine()
     }
     if (linesThisTurn > 0)
     {
+        PlaySound(TEXT("clear.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
         linesClearedTotal += linesThisTurn;
         if (linesThisTurn == 1)
             score += 100 * level;
@@ -438,7 +439,7 @@ void initGame() {
 
 int main()
 {
-    PlaySound(TEXT("bgm.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+    
     SetConsoleOutputCP(CP_UTF8);
     srand((unsigned)time(0));
     loadHighScores();
