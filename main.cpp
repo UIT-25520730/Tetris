@@ -290,7 +290,7 @@ void removeLine()
     }
     if (linesThisTurn > 0)
     {
-        PlaySound(TEXT("clear.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+        PlaySound(TEXT("clearline.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
         linesClearedTotal += linesThisTurn;
         if (linesThisTurn == 1)
             score += 100 * level;
@@ -565,7 +565,7 @@ int main()
             }
 
             if (GetAsyncKeyState('Q') & 0x8000) {
-            saveHighScore(score); // <- Thêm dòng này ở đây
+            saveHighScore(score); 
             break;
             }
 
