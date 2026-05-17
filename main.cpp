@@ -470,14 +470,34 @@ int main()
             {
                 char rotated[4][4];
                 currentPiece->getRotatedShape(rotated);
+
+                // Rotate normally
                 if (canMove(0, 0, x, y, rotated))
                 {
                     currentPiece->applyRotation(rotated);
                     changed = true;
-                    FlushConsoleInputBuffer(hIn);
-                    while (_kbhit())
-                        _getch();
                 }
+
+                // Wall kick left
+                else if (canMove(-1, 0, x, y, rotated))
+                {
+                    x--;
+                    currentPiece->applyRotation(rotated);
+                    changed = true;
+                }
+
+                // Wall kick right
+                else if (canMove(1, 0, x, y, rotated))
+                {
+                    x++;
+                    currentPiece->applyRotation(rotated);
+                    changed = true;
+                }
+
+                FlushConsoleInputBuffer(hIn);
+
+                while (_kbhit())
+                    _getch();
             }
             if (GetAsyncKeyState('P') & 1) {
                 gotoxy(15, H / 2); cout << " \x1b[93m[ PAUSED ]\x1b[0m ";
