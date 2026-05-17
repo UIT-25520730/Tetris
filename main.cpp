@@ -271,8 +271,10 @@ void draw()
             renderBoard[i][j] = board[i][j];
 
     if (currentPiece != NULL){
+            boardDelBlock();
         int ghostY = y;
         while (canMove(0, 1, x, ghostY)) ghostY++;
+            block2Board();
         for (int i=0; i<4; i++) for (int j=0; j<4; j++)
             if (currentPiece->getCell(i, j) != ' ' && ghostY + i < H)
                 if (renderBoard[ghostY+i][x+j] == ' ') renderBoard[ghostY+i][x+j] = 'G'; 
