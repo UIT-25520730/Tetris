@@ -155,6 +155,31 @@ void loadHighScores() {
     }
 }
 
+void saveHighScore(int currentScore) {
+    highScores.push_back(currentScore); 
+    
+    for (size_t i = 0; i < highScores.size(); i++) {
+        for (size_t j = i + 1; j < highScores.size(); j++) {
+            if (highScores[i] < highScores[j]) {
+                int temp = highScores[i];
+                highScores[i] = highScores[j];
+                highScores[j] = temp;
+            }
+        }
+    }
+    
+    if (highScores.size() > 5) {
+        highScores.resize(5);
+    }
+    
+    ofstream file("highscore.txt");
+    for (int s : highScores) {
+        file << s << "\n";
+    }
+    file.close();
+}
+
+
 void enableANSIColors(HANDLE hOut)
 {
     DWORD dwMode = 0;
