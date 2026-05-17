@@ -434,7 +434,7 @@ int main()
                         _getch();
                 }
             }
-            if (GetAsyncKeyState('C') & 0x8000) {
+            if (GetAsyncKeyState('C') & 1) {
                 if (canHold) {
                     if (holdPiece == NULL) {
                         holdPiece = currentPiece;
@@ -477,7 +477,7 @@ int main()
                         _getch();
                 }
             }
-            if (GetAsyncKeyState('P') & 0x8000) {
+            if (GetAsyncKeyState('P') & 1) {
                 gotoxy(15, H / 2); cout << " \x1b[93m[ PAUSED ]\x1b[0m ";
                 Sleep(300);
                 FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
@@ -488,7 +488,7 @@ int main()
                 changed = true;
                 FlushConsoleInputBuffer(hIn); while (_kbhit()) _getch();
             }
-            if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
+            if (GetAsyncKeyState(VK_SPACE) & 1) {
                 int droppedCells = 0;
                 while (canMove(0, 1, x, y)) { y++; droppedCells++; }
                 score += droppedCells * 2;
